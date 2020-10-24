@@ -108,4 +108,4 @@ def activate_bot(token, name):
     config.SERVERS_DATA[name].start()
 
 if __name__ == '__main__':
-    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.R_GYikdeGlAyeH-ucZ6k9dNbsVc', 'Бася-вот')
+    activate('ТОКЕН', 'Бася-вот')
