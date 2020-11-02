@@ -7,20 +7,55 @@ import youtube_dl
 from discord import utils
 import asyncio
 import config
-import serching_for_url
+import AdditionThing
 import os
-
+import interface
 
 class MainMessage(discord.Client):
     async def on_ready(self):
+        config.SERVERS_DATA[config.name_of_bot] = self.guilds
+        print(self.guilds)
         self.is_connected = False
-        print('Запущенский')
+        interface_work = threading.Thread(target=interface.interface_start)
+        interface_work.start()
+        print('Запуск произошёл')
 
     async def on_voice_state_update(self, member, before, after):
-        print(before, '\n', after)
-        channel = after
-        print('Присоединился')
-        connected = None
+
+# __________________________________DUPLICATION PART__________________________________
+        if after.channel != before.channel:
+            if after.channel and after.channel.id not in config.unduplicate_pool:
+                new_name = after.channel.name + '1'
+                # for parant_key in list(config.duplicated_channels.keys()):
+                #     if all([self.get_channel(channel).members for channel in config.duplicated_channels[parant_key]]):
+                #         new_channel = await after.channel.clone(name=new_name, reason=None)
+                #         config.duplicated_channels[parant_key].append(new_channel.id)
+                # else:
+                #     if after.channel.id not in config.duplicated_channels:
+                #         new_channel = await after.channel.clone(name=new_name, reason=None)
+                #         config.duplicated_channels[after.channel.id] = [new_channel.id]
+                for parant_key in list(config.duplicated_channels.keys()):
+                    if after.channel.id in config.duplicated_channels[parant_key]:
+                        if all([self.get_channel(channel).members
+                                for channel in config.duplicated_channels[parant_key]]) and after.channel.members:
+                            new_channel = await after.channel.clone(name=new_name, reason=None)
+                            config.duplicated_channels[parant_key].append(new_channel.id)
+                            break
+                else:
+                    new_channel = await after.channel.clone(name=new_name, reason=None)
+                    config.duplicated_channels[after.channel.id] = [new_channel.id]
+
+            if before.channel:
+                for parent_key in list(config.duplicated_channels.keys()):
+                    if not self.get_channel(parent_key).members:
+                        for id in config.duplicated_channels[parent_key]:
+                            channel_to_del = self.get_channel(id)
+                            if not channel_to_del.members or all([member.bot for member in channel_to_del.members]):
+                                del config.duplicated_channels[parent_key][config.duplicated_channels[parent_key].index(id)]
+                                await channel_to_del.delete(reason=None)
+            print(config.duplicated_channels)
+
+
 
     async def on_message(self, message):
         print(f"chanel: {message.channel}\nauthor: {message.author}")
@@ -31,14 +66,14 @@ class MainMessage(discord.Client):
 
 # _____________________________Provisional measure for lessons ______________________________________________
 
-        if ''.join(str(message.content).lower().split()) in config.commands_to_lesson:
-            chanel, mes_cont = self.get_channel(765120036569481236), self.lesson_sender(message.content[6:])
-            print(chanel)
-            if chanel != message.channel:
-                await message.channel.send(mes_cont)
-            await chanel.send(mes_cont)
+        # if ''.join(str(message.content).lower().split()) in config.commands_to_lesson:
+        #     chanel, mes_cont = self.get_channel(765120036569481236), self.lesson_sender(message.content[6:])
+        #     print(chanel)
+        #     if chanel != message.channel:
+        #         await message.channel.send(mes_cont)
+        #     await chanel.send(mes_cont)
 
-# ___________________________________________________________________________________________________________
+# _____________________________________________MUSICAL PART_______________________________________________________
 
         for command in config.music_commands:
             if ''.join(str(message.content).lower().split()).startswith(command) and\
@@ -46,7 +81,7 @@ class MainMessage(discord.Client):
                 # music_thread = threading.Thread(target=self.music_activate)
                 # music_thread.start()
                 search_for = ' '.join(str(message.content).split())[len(command):]
-                url = serching_for_url.activate_url(search_for)
+                url = AdditionThing.activate_url(search_for)
 
                 await message.channel.send(url)
                 voice_channel = message.author.voice.channel
@@ -81,7 +116,7 @@ class MainMessage(discord.Client):
                         ydl.download([url])
                     except youtube_dl.utils.DownloadError:
                         pass
-                channel_with_bot.FFmpegAudio(f"{name_of_song}.m4a", executable='ffmpeg')
+                channel_with_bot.FFmpegPCMAudio(f"{name_of_song}.m4a", executable='ffmpeg')
                 # discord.FFmpegPCMAudio(),
                 #                       after=lambda e: print(f" (name) has finished playing"))
 
@@ -95,17 +130,26 @@ class MainMessage(discord.Client):
                f' {config.lesson_data[lesson]["indef"]}\nПароль: {config.lesson_data[lesson]["password"]}' \
                f'\nСсылка: {config.lesson_data[lesson]["url"]}'.replace('None', 'Нет информации')
 
+    #__________________________________________REACTIONS THING_____________________________________________
+
+    async def on_raw_reaction_add(self, payload):
+        pass
+
+    async def on_raw_reaction_remove(self, payload):
+        pass
 
 
 
-def activate(token, name):
+def activate(token):
     bot = MainMessage()
-    print(f'{name} is online')
     bot.run(token)
+    print(bot)
+    config_name_of_bot = 'Бася-вот'
 
-def activate_bot(token, name):
-    config.SERVERS_DATA[name] = threading.Thread(target=activate, args=(token,))
-    config.SERVERS_DATA[name].start()
+# def activate_bot(token, name):
+#     loop = asyncio.new_event_loop()
+#     loop.run_forever(activate(token))
 
 if __name__ == '__main__':
-    activate('ТОКЕН', 'Бася-вот')
+    # activate_bot('Токен', 'Бася-вот')
+    activate('Токен')
