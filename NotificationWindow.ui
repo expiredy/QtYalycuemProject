@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
-    <height>610</height>
+    <width>713</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,29 +19,42 @@
      <rect>
       <x>110</x>
       <y>40</y>
-      <width>511</width>
-      <height>281</height>
+      <width>481</width>
+      <height>302</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="date_data">
      <item>
-      <widget class="QCalendarWidget" name="DateEdit"/>
+      <widget class="QCalendarWidget" name="DateEdit">
+       <property name="styleSheet">
+        <string notr="true">QMenu { font-size:16px; width: 150px; left: 20px;
+	background-color:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop: 0 #cccccc, stop: 1 #333333);}
+	QToolButton {icon-size: 28px, 48px;background-color: qlineargradient(x1:0, y1:0, x2:0,
+	y2:1, stop: 0 #cccccc, stop: 1 #333333);}
+	QAbstractItemView {selection-background-color: rgb(255, 174, 0);}
+	QToolButton::menu-arrow {}
+	QToolButton::menu-button {}
+	QToolButton::menu-indicator{width: 25px;}
+	QToolButton::menu-indicator:pressed,&quot;
+	QToolButton::menu-indicator:open{top:10px; left: 10px;}
+	QListView {background-color:silver;}
+	QSpinBox::up-button { subcontrol-origin: border;
+	subcontrol-position: top right; width:50px; border-image: url(icons:arrow_up_n.png);}
+	QSpinBox::down-button {subcontrol-origin: border; subcontrol-position: bottom right;
+	border-width: 1px; width:50px;}
+	QSpinBox::down-arrow { width:26px; height:17px;
+	image: url(icons:arrow_down_n.png); } </string>
+       </property>
+      </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="QDateTimeEdit" name="FinalTimeEdit">
+       <property name="styleSheet">
+        <string notr="true">QDateTimeEdit{
+	color: #4d4d4d;
+}</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>30</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QDateTimeEdit" name="FinalTimeEdit"/>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -60,6 +73,9 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: #969696</string>
+    </property>
     <property name="text">
      <string>Выберете дату и время  для отправки оповещения</string>
     </property>
@@ -67,8 +83,8 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>340</y>
+      <x>270</x>
+      <y>330</y>
       <width>181</width>
       <height>51</height>
      </rect>
@@ -77,35 +93,35 @@
      <item>
       <widget class="QLabel" name="hours">
        <property name="text">
-        <string>00</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="freeSpece">
        <property name="text">
-        <string>:</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="minuts">
        <property name="text">
-        <string>00</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="freeSpece_for_seco">
        <property name="text">
-        <string>:</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="seconds">
        <property name="text">
-        <string>00</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -114,8 +130,8 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>400</y>
+      <x>240</x>
+      <y>390</y>
       <width>239</width>
       <height>80</height>
      </rect>
@@ -124,7 +140,7 @@
      <item row="0" column="1">
       <widget class="QPushButton" name="plus_minuts">
        <property name="text">
-        <string>⬆️</string>
+        <string>🔼</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">minuts_edit</string>
@@ -134,7 +150,7 @@
      <item row="1" column="0">
       <widget class="QPushButton" name="minus_hour">
        <property name="text">
-        <string>⬇️</string>
+        <string>🔽</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">hours_edit</string>
@@ -144,7 +160,7 @@
      <item row="1" column="1">
       <widget class="QPushButton" name="minus_minut">
        <property name="text">
-        <string>⬇️</string>
+        <string>🔽</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">minuts_edit</string>
@@ -154,7 +170,7 @@
      <item row="0" column="0">
       <widget class="QPushButton" name="plus_hour">
        <property name="text">
-        <string>⬆️</string>
+        <string>🔼</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">hours_edit</string>
@@ -164,7 +180,7 @@
      <item row="0" column="2">
       <widget class="QPushButton" name="plus_seconds">
        <property name="text">
-        <string>⬆️</string>
+        <string>🔼</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">seconds_edit</string>
@@ -174,7 +190,7 @@
      <item row="1" column="2">
       <widget class="QPushButton" name="minus_seconds">
        <property name="text">
-        <string>⬇️</string>
+        <string>🔽</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">seconds_edit</string>
@@ -183,53 +199,174 @@
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="start_button">
+   <widget class="QFrame" name="background">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>500</y>
-      <width>141</width>
-      <height>51</height>
+      <x>-10</x>
+      <y>0</y>
+      <width>1191</width>
+      <height>941</height>
      </rect>
     </property>
-    <property name="text">
-     <string>OK</string>
+    <property name="styleSheet">
+     <string notr="true">color:  #4d4d4d;
+background-color: #323232;
+border: none;</string>
     </property>
-   </widget>
-   <widget class="QPushButton" name="send_now">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>410</y>
-      <width>91</width>
-      <height>71</height>
-     </rect>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-    <property name="text">
-     <string>Отправить
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QCheckBox" name="isLooped">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>480</y>
+       <width>124</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">    background-color: #969696;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 9px;
+    border-color: beige;
+    font: bold 12px;
+    min-width: 8em;
+    padding: 4px;</string>
+     </property>
+     <property name="text">
+      <string>Повторять</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="start_button">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>530</y>
+       <width>186</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+    background-color: #969696;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}
+
+QPushButton:hover{
+	    background-color: #767676;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+     </property>
+     <property name="text">
+      <string>OK</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="send_now">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>400</y>
+       <width>186</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+    background-color: #969696;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}
+
+QPushButton:hover{
+	    background-color: #767676;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+     </property>
+     <property name="text">
+      <string>Отправить
  сейчас</string>
-    </property>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="cancel">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>400</y>
+       <width>186</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+    background-color: #969696;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}
+
+QPushButton:hover{
+	    background-color: #767676;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 14px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+     </property>
+     <property name="text">
+      <string>отмена</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="cancel">
-    <property name="geometry">
-     <rect>
-      <x>590</x>
-      <y>410</y>
-      <width>75</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>отмена</string>
-    </property>
-   </widget>
+   <zorder>background</zorder>
+   <zorder>verticalLayoutWidget</zorder>
+   <zorder>ask_to_change</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>gridLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>727</width>
+     <width>713</width>
      <height>21</height>
     </rect>
    </property>

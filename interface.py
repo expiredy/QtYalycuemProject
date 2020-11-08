@@ -1,23 +1,49 @@
 import datetime
 import threading
 import sys
+import discord
 import config
 from PyQt5 import uic  # Импортируем uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 import pyglet
 
 class ServerChoice(QMainWindow):
     def __init__(self, server):
         super().__init__()
-        self.server = server
-        self.setTitle(self.server.name)
         uic.loadUi('Servers_choice.ui', self)
 
+
+
 class Server(QMainWindow):
-    def __init__(self, server_at_worked):
+    def __init__(self, server_at_worked_id):
         super().__init__()
-        self.server_at_worked = server_at_worked
+        self.server_at_worked = config.SERVERS_DATA[config.name_of_bot][server_at_worked_id]['server_data']
         uic.loadUi('ServerSetup.ui', self)
+        print(self.server_at_worked.name)
+        self.setWindowTitle(self.server_at_worked.name)
+        self.ExitButton.clicked.connect(self.back)
+        self.channels_distribution()
+
+
+    def channels_distribution(self):
+        self.categories = {}
+        for category in self.server_at_worked.categories:
+            self.categories[category.id] = {}
+            label = QLabel(self)
+            label.setText(category.name)
+            self.layoutWithChannels.addWidget(label)
+            for channel in category.channels:
+                self.categories[category.id][channel.id] = QPushButton(channel.name, self)
+                self.layoutWithChannels.addWidget(self.categories[category.id][channel.id])
+                self.categories[category.id][channel.id].clicked.connect(self.channel_settings)
+                self.categories[category.id][channel.id].show()
+
+    def channel_settings(self):
+        print(self.sender().text())
+
+    def back(self):
+        self.close()
+
 
 class NotificationWindow(QMainWindow):
     def __init__(self):
@@ -32,27 +58,33 @@ class NotificationWindow(QMainWindow):
 
     def start_time_set(self):
         year, month, day, hours, minuts, seconds = datetime.datetime.now().strftime('%Y %m %d %H %M %S').split()
-        self.hours.setText(hours)
-        self.minuts.setText(minuts)
-        self.seconds.setText(str(int(seconds) + 1))
+        self.hours.setText('<strong>' + hours + '<strong>')
+        self.minuts.setText('<strong>' + minuts + '<strong>')
+        self.seconds.setText('<strong>' + str(int(seconds) + 1) + '<strong>')
 
     def change_hours(self):
         if self.sender().text() == '🔼':
-            self.hours.setText(str((int(self.hours.text()) + 1) % 24))
+            self.hours.setText('<strong>' + str((int(self.hours.text().replace('<strong>', ''))
+                                                 + 1) % 24) + '<strong>')
         else:
-            self.hours.setText(str((int(self.hours.text()) - 1) % 24))
+            self.hours.setText('<strong>' + str((int(self.hours.text().replace('<strong>', ''))
+                                                 - 1) % 24) + '<strong>')
 
     def change_minuts(self):
         if self.sender().text() == '🔼':
-            self.minuts.setText(str((int(self.minuts.text()) + 1) % 60))
+            self.minuts.setText('<strong>' + str((int(self.minuts.text().replace('<strong>', ''))
+                                                  + 1) % 60) + '<strong>')
         else:
-            self.minuts.setText(str((int(self.minuts.text()) - 1) % 60))
+            self.minuts.setText('<strong>' + str((int(self.minuts.text().replace('<strong>', ''))
+                                                  - 1) % 60) + '<strong>')
 
     def change_seconds(self):
         if self.sender().text() == '🔼':
-            self.seconds.setText(str((int(self.seconds.text()) + 1) % 60))
+            self.seconds.setText('<strong>' + str((int(self.seconds.text().replace('<strong>', ''))
+                                                   + 1) % 60) + '<strong>')
         else:
-            self.seconds.setText(str((int(self.seconds.text()) - 1) % 60))
+            self.seconds.setText('<strong>' + str((int(self.seconds.text().replace('<strong>', ''))
+                                                   - 1) % 60) + '<strong>')
 
 class StartWindow(QMainWindow):
     def __init__(self):
@@ -64,11 +96,15 @@ class StartWindow(QMainWindow):
 
     def add_servers_choice(self):
         self.buttons_with_servers = {}
-        for server in config.SERVERS_DATA[config.name_of_bot]:
-            button_server = QPushButton('\n\n' + server.name + '\n\n', self)
+        for server_id in list(config.SERVERS_DATA[config.name_of_bot].keys()):
+            button_server = QPushButton('\n\n' +
+                                        config.SERVERS_DATA[config.name_of_bot][server_id]['server_data'].name
+                                        + '\n\n', self)
             button_server.clicked.connect(self.open_server)
             self.layoutWithServers.addWidget(button_server)
-            self.buttons_with_servers[server.id] = {'servers_data': server, 'button': button_server}
+            self.buttons_with_servers[server_id] =\
+                {'server_data': config.SERVERS_DATA[config.name_of_bot][server_id]['server_data'],
+                 'button': button_server}
 
 
     def open_server(self):
