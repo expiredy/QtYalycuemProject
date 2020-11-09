@@ -6,73 +6,163 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>784</width>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="servers_add">
+   <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>10</y>
-      <width>341</width>
-      <height>81</height>
+      <x>-10</x>
+      <y>0</y>
+      <width>791</width>
+      <height>561</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Добавление сервера</string>
-    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="servers_add">
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+	background-color:#a82b2b;
+    border-style: outset;
+    border-width: 6px;
+    border-radius: 8px;
+    border-color: beige;
+    font: bold 14px;
+    padding: 6px;
+    min-width: 10em;
+}
+
+
+QPushButton:hover{
+	background-color: #c51a1a;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 18px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+         </property>
+         <property name="text">
+          <string>
+Nothing
+</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="notifications_add">
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+	background-color:#a82b2b;
+    border-style: outset;
+    border-width: 4px;
+    border-radius: 3px;
+    border-color: #FFFFFF;
+    font: bold 18px;
+    padding: 6px;
+    min-width: 10em;
+
+
+}
+
+
+QPushButton:hover{
+	background-color: #c51a1a;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 22px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+         </property>
+         <property name="text">
+          <string>
+Добавление уведомления
+</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="WeAreNumberOne">
+         <property name="styleSheet">
+          <string notr="true">QPushButton{
+	background-color:#a82b2b;
+    border-style: outset;
+    border-width: 6px;
+    border-radius: 8px;
+    border-color: beige;
+    font: bold 14px;
+    padding: 6px;
+    min-width: 10em;
+}
+
+
+QPushButton:hover{
+	background-color: #c51a1a;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 1px;
+    border-color: beige;
+    font: bold 18px;
+    min-width: 10em;
+    padding: 6px;
+}</string>
+         </property>
+         <property name="text">
+          <string>
+1
+</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="layoutWithServers"/>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="notifications_add">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>120</y>
-      <width>341</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Добавление уведомления</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>230</y>
-      <width>341</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="WeAreNumberOne">
+   <widget class="QFrame" name="background">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>540</y>
-      <width>21</width>
-      <height>21</height>
+      <y>-21</y>
+      <width>1231</width>
+      <height>961</height>
      </rect>
     </property>
-    <property name="text">
-     <string>1</string>
+    <property name="styleSheet">
+     <string notr="true">QFrame{background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(21, 30, 106, 255),                                  stop:0.5 rgba(28, 131, 105, 255), stop:1 rgba(41, 114, 178, 255));
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
    </widget>
+   <zorder>background</zorder>
+   <zorder>gridLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>784</width>
      <height>21</height>
     </rect>
    </property>

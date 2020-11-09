@@ -6,6 +6,7 @@ import config
 from PyQt5 import uic  # Импортируем uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 import pyglet
+from time import sleep
 
 class ServerChoice(QMainWindow):
     def __init__(self, server):
@@ -92,6 +93,8 @@ class StartWindow(QMainWindow):
         uic.loadUi('main.ui', self)
         self.add_servers_choice()
         self.notifications_add.clicked.connect(self.add_notification)
+        # animation = threading.Thread(target=self.animate_background)
+        # animation.start()
         self.WeAreNumberOne.clicked.connect(self.easter_egg)
 
     def add_servers_choice(self):
@@ -101,11 +104,27 @@ class StartWindow(QMainWindow):
                                         config.SERVERS_DATA[config.name_of_bot][server_id]['server_data'].name
                                         + '\n\n', self)
             button_server.clicked.connect(self.open_server)
+            button_server.setStyleSheet(config.servers_theme)
             self.layoutWithServers.addWidget(button_server)
             self.buttons_with_servers[server_id] =\
                 {'server_data': config.SERVERS_DATA[config.name_of_bot][server_id]['server_data'],
                  'button': button_server}
 
+    def animate_background(self):
+        step = position = 0.01
+        while True:
+            self.background.setStyleSheet('QFrame{\n'
+                                          '	background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0,'
+                                          ' stop:0 rgba(21, 30, 106, 255),'
+                                          ' stop:' + str(position) +' rgba(28, 131, 105, 255),'
+                                          ' stop:1 rgba(41, 114, 178, 255));\n}')
+
+            sleep(0.1)
+            if position + step >= 0.8:
+                step = 0 - step
+            elif position + step <= 0.2:
+                step = abs(step)
+            position += step
 
     def open_server(self):
         for server in list(self.buttons_with_servers.keys()):

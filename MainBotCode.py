@@ -58,29 +58,33 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
+    def get_file():
+        return
+
 # __________________________________________________Main Code Thing_______________________________
 class MainMessage(discord.Client):
     async def on_ready(self):
+        config.name_of_bot = self.user.name
         config.SERVERS_DATA[config.name_of_bot] = {}
         for guild in self.guilds:
             config.SERVERS_DATA[config.name_of_bot][guild.id] = {'server_data': guild}
         print(self.guilds)
         interface_work = threading.Thread(target=interface.interface_start)
         interface_work.start()
-        print('Запуск произошёл')
+
+        print(f'Запуск {config.name_of_bot} произошёл')
 
     async def on_voice_state_update(self, member, before, after):
-
 # __________________________________DUPLICATION PART__________________________________
         print(config.duplicated_channels)
         if after.channel != before.channel:
 
-            if after.channel and not member.bot:
+            if after.channel and not member.bot and after.channel.id not in config.unduplicate_pool:
                 is_created = False
                 new_name = after.channel.name
                 for parent_key in list(config.duplicated_channels.keys()):
                     if after.channel.id in config.duplicated_channels[parent_key] or after.channel.id == parent_key:
-                        if self.get_channel(parent_key).members and \
+                        if self.get_channel(parent_key).members and\
                                 all([self.get_channel(id).members for id in config.duplicated_channels[parent_key]]):
                             new_channel = await after.channel.clone(name=new_name, reason=None)
                             config.duplicated_channels[parent_key].append(new_channel.id)
@@ -117,43 +121,102 @@ class MainMessage(discord.Client):
                     message.channel.id in config.music_channels:
                 search_for = ' '.join(str(message.content).split())[len(command):]
                 url = AdditionThing.activate_url(search_for)
-                info = AdditionThing.url_info(url)
-                await message.channel.send(url)
-                if message.author.voice.channel:
+                if message.guild.id not in config.music_data:
+                    config.music_data[message.guild.id] = {}
+                if message.author.voice:
                     voice_channel_to_connect = message.author.voice.channel
-                    channel_with_bot = await voice_channel_to_connect.connect(reconnect=True, timeout=1.0)
+                    if 'channel' not in config.music_data[message.guild.id] or not\
+                            config.music_data[message.guild.id]['channel']:
+                        channel_with_bot = await voice_channel_to_connect.connect()
+                        config.music_data[channel_with_bot.channel.guild.id]['channel'] = channel_with_bot
+                    elif config.music_data[message.guild.id]['channel'].channel.id != voice_channel_to_connect.id:
+                        channel_with_bot = await config.music_data[message.guild.id]\
+                            ['channel'].move_to(voice_channel_to_connect)
                 else:
-                    channel_with_bot = await self.move_to(voice_channel_to_connect)
+                    await message.channel.send(random.choice(config.not_in_channel))
+                    return
 
+                if not config.music_data[message.guild.id]['channel'].is_playing():
 
-                async with message.channel.typing():
-                    player = await YTDLSource.from_url(url, loop=self.loop)
+                    if 'Mdata' in config.music_data[message.guild.id]:
+                        config.music_data[message.guild.id]['Mdata'].append(url)
+                    else:
+                        config.music_data[message.guild.id]['Mdata'] = [url]
+                    info = AdditionThing.url_info(url, message.author)
+                    player = await YTDLSource.from_url(config.music_data[message.guild.id]['Mdata'][0],
+                                                       loop=self.loop, stream=info[1])
+                    if config.music_data[message.author.guild.id]['channel']:
+                        channel_with_bot = config.music_data[message.author.guild.id]['channel']
                     channel_with_bot.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+                    config.now_playing = message.author.id
+
+                    music_message = await message.channel.send(embed=info[0])
+                    for emoji in [config.music_icons[key] for key in list(config.music_icons.keys())]:
+                        await music_message.add_reaction(emoji)
+                    config.music_payloads[message.guild.id] = {'mes_id': music_message.id, 'message': music_message}
+                    del config.music_data[message.guild.id]['Mdata'][0]
+                else:
+                    config.music_data[message.guild.id]['Mdata'].append(url)
+                    await message.channel.send(f'Добавлено в очередь, номер -'
+                                         f' {len(config.music_data[message.guild.id]["Mdata"])}')
 
 
-
-
-    #__________________________________________REACTIONS THING_____________________________________________
+#_________________________________________________REACTIONS THING_____________________________________________
 
     async def on_raw_reaction_add(self, payload):
-        for guild_id in config.music_pyloads:
-            if payload.id in config.music_pyloads[guild_id]:
-                pass
+
+# _____________________________________________Music _________________________________________________________
+        for guild_id in config.music_payloads:
+            if payload.message_id == config.music_payloads[guild_id]['mes_id']:
+                if payload.member.id == config.now_playing or payload.member.id:
+                    print(payload.emoji.name)
+                    if payload.emoji.name == config.music_icons['stop']\
+                            and config.music_data[payload.guild_id]['channel'].is_playing():
+                        voice_channel = config.music_data[payload.guild_id]['channel']
+                        voice_channel.pause()
+
+                    elif payload.emoji.name == config.music_icons['play']:
+                        if not config.music_data[payload.guild_id]['channel']:
+                            config.music_data[payload.guild_id]['channel'] =\
+                                await payload.member.voice.channel.connect()
+                        if config.music_data[payload.guild_id]['channel'].is_paused():
+                            voice_channel = config.music_data[payload.guild_id]['channel']
+                            voice_channel.resume()
+
+                    elif payload.emoji.name == config.music_icons['break']:
+                        voice_channel = config.music_data[payload.guild_id]['channel']
+                        voice_channel.pause()
+                        config.music_data[payload.guild_id]['channel'] = None
+                        await voice_channel.disconnect()
+
+                    elif payload.emoji.name == config.music_icons['loop']:
+                        pass
+
+                await config.music_payloads[payload.guild_id]['message']\
+                    .remove_reaction(payload.emoji, payload.member)
+
+#_______________________________________________Roles________________________________________________________
+        try:
+            pass
+        except BaseException:
+            pass
+
         # await self.get_channel(payload.channel_id).send(payload)
 
     async def on_raw_reaction_remove(self, payload):
-        pass
+# _______________________________________________Roles________________________________________________________
+        try:
+            pass
+        except BaseException:
+            pass
         # await self.get_channel(payload.channel_id).send(payload)
-
-
 
 
 def activate(token):
     bot = MainMessage()
     bot.run(token)
     print(bot)
-    config_name_of_bot = 'Бася-вот'
 
 
 if __name__ == '__main__':
-    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.fEp1K6hBLZKWhEzrQT3nJTLw06g')
+    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.TNBffWvyhLfZog5Yt-YnPrnGF9Y')
