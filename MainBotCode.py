@@ -58,8 +58,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
-    def get_file():
-        return
 
 # __________________________________________________Main Code Thing_______________________________
 class MainMessage(discord.Client):
@@ -68,9 +66,9 @@ class MainMessage(discord.Client):
         config.SERVERS_DATA[config.name_of_bot] = {}
         for guild in self.guilds:
             config.SERVERS_DATA[config.name_of_bot][guild.id] = {'server_data': guild}
-        print(self.guilds)
         interface_work = threading.Thread(target=interface.interface_start)
         interface_work.start()
+        self.music_is_looped = False
 
         print(f'Запуск {config.name_of_bot} произошёл')
 
@@ -105,15 +103,26 @@ class MainMessage(discord.Client):
             print(config.duplicated_channels)
             print()
 
+    async def next_song(self, channel, member):
+        if config.music_data[channel.guild.id]['channel']:
+            if not self.music_is_looped:
+                del config.music_data[channel.guild.id]['Mdata'][0]
+            if 'Mdata' in config.music_data[channel.guild.id] and config.music_data[channel.guild.id]['Mdata']:
+                info = AdditionThing.url_info(config.music_data[channel.guild.id]['Mdata'][0],
+                                              member)
+                player = await YTDLSource.from_url(config.music_data[channel.guild.id]['Mdata'][0],
+                                                   loop=self.loop, stream=info[1])
+                music_message = await channel.send(embed=info[0])
+                config.music_data[channel.guild.id]['channel'].pause()
+
+                config.music_data[channel.guild.id]['channel'].play(player, after=lambda e: None)
+                # self.next_song(self.get_channel(payload.channel_id), payload.member)
+                config.music_payloads[channel.guild.id]['mes_id'] = music_message.id
+                for emoji in [config.music_icons[key] for key in list(config.music_icons.keys())]:
+                    await music_message.add_reaction(emoji)
 
 
     async def on_message(self, message):
-        # print(f"chanel: {message.channel}\nauthor: {message.author}")
-        # print(message)
-        if not message.author.bot:
-            pass
-
-
 # _____________________________________________MUSICAL PART_______________________________________________________
 
         for command in config.music_commands:
@@ -142,23 +151,23 @@ class MainMessage(discord.Client):
                         config.music_data[message.guild.id]['Mdata'].append(url)
                     else:
                         config.music_data[message.guild.id]['Mdata'] = [url]
-                    info = AdditionThing.url_info(url, message.author)
+                    info = AdditionThing.url_info(config.music_data[message.guild.id]['Mdata'][0],
+                                                  message.author)
                     player = await YTDLSource.from_url(config.music_data[message.guild.id]['Mdata'][0],
                                                        loop=self.loop, stream=info[1])
                     if config.music_data[message.author.guild.id]['channel']:
                         channel_with_bot = config.music_data[message.author.guild.id]['channel']
-                    channel_with_bot.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                    config.now_playing = message.author.id
+                    channel_with_bot.play(player, after=lambda e: None)
+                    # self.next_song(message.channel, message.author))
 
                     music_message = await message.channel.send(embed=info[0])
                     for emoji in [config.music_icons[key] for key in list(config.music_icons.keys())]:
                         await music_message.add_reaction(emoji)
                     config.music_payloads[message.guild.id] = {'mes_id': music_message.id, 'message': music_message}
-                    del config.music_data[message.guild.id]['Mdata'][0]
                 else:
                     config.music_data[message.guild.id]['Mdata'].append(url)
                     await message.channel.send(f'Добавлено в очередь, номер -'
-                                         f' {len(config.music_data[message.guild.id]["Mdata"])}')
+                                         f' {len(config.music_data[message.guild.id]["Mdata"]) - 1}')
 
 
 #_________________________________________________REACTIONS THING_____________________________________________
@@ -168,14 +177,18 @@ class MainMessage(discord.Client):
 # _____________________________________________Music _________________________________________________________
         for guild_id in config.music_payloads:
             if payload.message_id == config.music_payloads[guild_id]['mes_id']:
-                if payload.member.id == config.now_playing or payload.member.id:
+                if not payload.member.bot:
+                    await config.music_payloads[payload.guild_id]['message'] \
+                        .remove_reaction(payload.emoji, payload.member)
+                emoji = payload.emoji.name
+                if payload.member.id and not payload.member.bot:
                     print(payload.emoji.name)
-                    if payload.emoji.name == config.music_icons['stop']\
+                    if emoji == config.music_icons['stop']\
                             and config.music_data[payload.guild_id]['channel'].is_playing():
                         voice_channel = config.music_data[payload.guild_id]['channel']
                         voice_channel.pause()
 
-                    elif payload.emoji.name == config.music_icons['play']:
+                    elif emoji == config.music_icons['play']:
                         if not config.music_data[payload.guild_id]['channel']:
                             config.music_data[payload.guild_id]['channel'] =\
                                 await payload.member.voice.channel.connect()
@@ -183,17 +196,28 @@ class MainMessage(discord.Client):
                             voice_channel = config.music_data[payload.guild_id]['channel']
                             voice_channel.resume()
 
-                    elif payload.emoji.name == config.music_icons['break']:
+                    elif emoji == config.music_icons['break']:
                         voice_channel = config.music_data[payload.guild_id]['channel']
                         voice_channel.pause()
                         config.music_data[payload.guild_id]['channel'] = None
                         await voice_channel.disconnect()
 
-                    elif payload.emoji.name == config.music_icons['loop']:
-                        pass
+                    elif emoji == config.music_icons['loop']:
+                        if config.music_data[payload.guild_id]['channel']\
+                                and config.music_data[payload.guild_id]['channel'].is_playing():
+                            if self.music_is_looped:
+                                self.music_is_looped = False
+                            else:
+                                self.music_is_looped = True
 
-                await config.music_payloads[payload.guild_id]['message']\
-                    .remove_reaction(payload.emoji, payload.member)
+                    elif emoji == config.music_icons['skip']:
+                        if config.music_data[payload.guild_id]['channel'].is_playing():
+                            self.music_is_looped = False
+                            await self.next_song(self.get_channel(payload.channel_id), payload.member)
+                    elif emoji == config.music_icons['next']:
+                        await self.next_song(self.get_channel(payload.channel_id), payload.member)
+
+
 
 #_______________________________________________Roles________________________________________________________
         try:
@@ -219,4 +243,4 @@ def activate(token):
 
 
 if __name__ == '__main__':
-    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.TNBffWvyhLfZog5Yt-YnPrnGF9Y')
+    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.y-IIUJjYRQz93VlLuyKGxE5PZSI')

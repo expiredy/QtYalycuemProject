@@ -43,7 +43,7 @@ if __name__ == '__main__':
     sys.exit(app.exec_())
 
 
-# token: Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.TNBffWvyhLfZog5Yt-YnPrnGF9Y)
+# token: Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.CvQHJuq6UV4V4jgChT6daBiW5jQ
 
 
-# bot_code.activate("Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.TNBffWvyhLfZog5Yt-YnPrnGF9Y")
+# bot_code.activate("Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.CvQHJuq6UV4V4jgChT6daBiW5jQ")

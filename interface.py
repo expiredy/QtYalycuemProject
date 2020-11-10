@@ -4,7 +4,7 @@ import sys
 import discord
 import config
 from PyQt5 import uic  # Импортируем uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QGroupBox, QScrollArea
 import pyglet
 from time import sleep
 
@@ -27,6 +27,7 @@ class Server(QMainWindow):
 
 
     def channels_distribution(self):
+        self.groupBox = QGroupBox()
         self.categories = {}
         for category in self.server_at_worked.categories:
             self.categories[category.id] = {}
@@ -35,9 +36,11 @@ class Server(QMainWindow):
             self.layoutWithChannels.addWidget(label)
             for channel in category.channels:
                 self.categories[category.id][channel.id] = QPushButton(channel.name, self)
-                self.layoutWithChannels.addWidget(self.categories[category.id][channel.id])
                 self.categories[category.id][channel.id].clicked.connect(self.channel_settings)
                 self.categories[category.id][channel.id].show()
+                self.layoutWithChannels.addWidget(self.categories[category.id][channel.id])
+
+
 
     def channel_settings(self):
         print(self.sender().text())
@@ -55,6 +58,8 @@ class NotificationWindow(QMainWindow):
         [button.clicked.connect(self.change_hours) for button in self.hours_edit.buttons()]
         [button.clicked.connect(self.change_minuts) for button in self.minuts_edit.buttons()]
         [button.clicked.connect(self.change_seconds) for button in self.seconds_edit.buttons()]
+        self.start_button.clicked.connect(self.channel_choice)
+        self.cancel.clicked.connect(self.stop)
 
 
     def start_time_set(self):
@@ -62,6 +67,7 @@ class NotificationWindow(QMainWindow):
         self.hours.setText('<strong>' + hours + '<strong>')
         self.minuts.setText('<strong>' + minuts + '<strong>')
         self.seconds.setText('<strong>' + str(int(seconds) + 1) + '<strong>')
+
 
     def change_hours(self):
         if self.sender().text() == '🔼':
@@ -79,6 +85,7 @@ class NotificationWindow(QMainWindow):
             self.minuts.setText('<strong>' + str((int(self.minuts.text().replace('<strong>', ''))
                                                   - 1) % 60) + '<strong>')
 
+
     def change_seconds(self):
         if self.sender().text() == '🔼':
             self.seconds.setText('<strong>' + str((int(self.seconds.text().replace('<strong>', ''))
@@ -86,6 +93,20 @@ class NotificationWindow(QMainWindow):
         else:
             self.seconds.setText('<strong>' + str((int(self.seconds.text().replace('<strong>', ''))
                                                    - 1) % 60) + '<strong>')
+
+    def channel_choice(self):
+        for guild in config.SERVERS_DATA:
+            for channel in category.channels:
+                pass
+
+
+    def stop(self):
+        self.close()
+
+class ChanelChoiceWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.loadUi('ServersChoice.ui')
 
 class StartWindow(QMainWindow):
     def __init__(self):
@@ -95,7 +116,7 @@ class StartWindow(QMainWindow):
         self.notifications_add.clicked.connect(self.add_notification)
         # animation = threading.Thread(target=self.animate_background)
         # animation.start()
-        self.WeAreNumberOne.clicked.connect(self.easter_egg)
+
 
     def add_servers_choice(self):
         self.buttons_with_servers = {}
@@ -110,21 +131,21 @@ class StartWindow(QMainWindow):
                 {'server_data': config.SERVERS_DATA[config.name_of_bot][server_id]['server_data'],
                  'button': button_server}
 
-    def animate_background(self):
-        step = position = 0.01
-        while True:
-            self.background.setStyleSheet('QFrame{\n'
-                                          '	background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0,'
-                                          ' stop:0 rgba(21, 30, 106, 255),'
-                                          ' stop:' + str(position) +' rgba(28, 131, 105, 255),'
-                                          ' stop:1 rgba(41, 114, 178, 255));\n}')
-
-            sleep(0.1)
-            if position + step >= 0.8:
-                step = 0 - step
-            elif position + step <= 0.2:
-                step = abs(step)
-            position += step
+    # def animate_background(self):
+    #     step = position = 0.01
+    #     while True:
+    #         self.background.setStyleSheet('QFrame{\n'
+    #                                       '	background-color:qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0,'
+    #                                       ' stop:0 rgba(21, 30, 106, 255),'
+    #                                       ' stop:' + str(position) +' rgba(28, 131, 105, 255),'
+    #                                       ' stop:1 rgba(41, 114, 178, 255));\n}')
+    #
+    #         sleep(0.1)
+    #         if position + step >= 0.8:
+    #             step = 0 - step
+    #         elif position + step <= 0.2:
+    #             step = abs(step)
+    #         position += step
 
     def open_server(self):
         for server in list(self.buttons_with_servers.keys()):
@@ -133,10 +154,6 @@ class StartWindow(QMainWindow):
                 self.buttons_with_servers[server]['window'] = Server(server)
                 self.buttons_with_servers[server]['window'].show()
                 break
-
-    def easter_egg(self):
-        easter_music = threading.Thread(target=self.sound_player, args=('WeAreNumberOne.mp3',))
-        easter_music.start()
 
     def sound_player(self, music):
         song = pyglet.media.load(music)

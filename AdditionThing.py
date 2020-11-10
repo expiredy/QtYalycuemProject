@@ -44,7 +44,7 @@ def timer_activate(time, condition=True, intermediate_func=plug(), args_for_inte
     timer.start()
 
 
-#____________________________________________URL SEARCHING_________________________________________
+#____________________________________________URL SEARCHING AND OTHER STUFF_________________________________________
 
 def fast_play():
     pass
@@ -96,14 +96,14 @@ def url_info(video_url, member):
     embed = discord.Embed(title="**Сейчас играет:** " + data_about_vid['title'],
                           url=video_url,
                           description=data_about_vid['author_name'], color=int(new_color))
-    embed.set_author(name=f"По заказу {member.nick}",
+    embed.set_author(name=f"По заказу {member.nick if member.nick else member.name}",
                      icon_url = member.avatar_url)
     embed.set_thumbnail(url=data_about_vid['thumbnail_url'])
     if 'Mdata' in config.music_data[member.guild.id]:
         for i in range(len(config.music_data[member.guild.id]['Mdata'][1:])):
             if i < 5:
-                vid_info = url_parsing(config.music_data[message.guild.id]['Mdata'][i])
-                embed.add_field(name=f"**{i}**.", value=f'Название: {vid_info["title"]}'
+                vid_info = url_parsing(config.music_data[member.guild.id]['Mdata'][i])
+                embed.add_field(name=f"**{i + 1}**.", value=f'Название: {vid_info["title"]}'
                                                         f' Автор: {vid_info["author_name"]}', inline=False)
             else:
                 embed.add_field(name='И много всего другого)))')
@@ -111,8 +111,7 @@ def url_info(video_url, member):
     print(data_about_vid['type'])
     return (embed, data_about_vid['type'] != 'video')
 
-def ChoiceColor():
-    pass
+
 
 # async def sender(channel, text):
 #     await channel.send(text)

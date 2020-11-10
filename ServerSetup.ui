@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>657</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,10 +30,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>339</x>
+      <x>439</x>
       <y>-1</y>
-      <width>461</width>
-      <height>571</height>
+      <width>361</width>
+      <height>611</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -60,24 +60,6 @@ QPushButton:hover{
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>
-PushButton
-</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>
-PushButton
-</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
    <widget class="QScrollArea" name="scrollArea">
@@ -85,9 +67,14 @@ PushButton
      <rect>
       <x>-1</x>
       <y>20</y>
-      <width>311</width>
+      <width>421</width>
       <height>581</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QScrollArea{
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.318182 rgba(48, 48, 48, 255), stop:0.534091 rgba(63, 69, 74, 255), stop:0.755682 rgba(48, 48, 48, 255), stop:0.965909 rgba(0, 0, 0, 255));
+}</string>
     </property>
     <property name="widgetResizable">
      <bool>true</bool>
@@ -97,17 +84,17 @@ PushButton
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>309</width>
+       <width>419</width>
        <height>579</height>
       </rect>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>0</y>
-        <width>281</width>
-        <height>681</height>
+        <width>391</width>
+        <height>911</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="layoutWithChannels"/>
@@ -121,12 +108,42 @@ PushButton
         <height>581</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">QScrollBar{
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.318182 rgba(48, 48, 48, 255), stop:0.534091 rgba(63, 69, 74, 255), stop:0.755682 rgba(48, 48, 48, 255), stop:0.965909 rgba(0, 0, 0, 255));
+}</string>
+      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </widget>
    </widget>
+   <widget class="QFrame" name="background">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>-20</y>
+      <width>791</width>
+      <height>651</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.318182 rgba(48, 48, 48, 255), stop:0.534091 rgba(63, 69, 74, 255), stop:0.755682 rgba(48, 48, 48, 255), stop:0.965909 rgba(0, 0, 0, 255));
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+   <zorder>background</zorder>
+   <zorder>ExitButton</zorder>
+   <zorder>verticalLayoutWidget_2</zorder>
+   <zorder>scrollArea</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
