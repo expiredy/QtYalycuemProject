@@ -103,23 +103,22 @@ class MainMessage(discord.Client):
             print(config.duplicated_channels)
             print()
 
-    async def next_song(self, channel, member):
-        if config.music_data[channel.guild.id]['channel']:
-            if not self.music_is_looped:
-                del config.music_data[channel.guild.id]['Mdata'][0]
-            if 'Mdata' in config.music_data[channel.guild.id] and config.music_data[channel.guild.id]['Mdata']:
-                info = AdditionThing.url_info(config.music_data[channel.guild.id]['Mdata'][0],
-                                              member)
-                player = await YTDLSource.from_url(config.music_data[channel.guild.id]['Mdata'][0],
-                                                   loop=self.loop, stream=info[1])
-                music_message = await channel.send(embed=info[0])
-                config.music_data[channel.guild.id]['channel'].pause()
 
-                config.music_data[channel.guild.id]['channel'].play(player, after=lambda e: None)
-                # self.next_song(self.get_channel(payload.channel_id), payload.member)
-                config.music_payloads[channel.guild.id]['mes_id'] = music_message.id
-                for emoji in [config.music_icons[key] for key in list(config.music_icons.keys())]:
-                    await music_message.add_reaction(emoji)
+    def music_player(self, channel_to_play, guild_id):
+        if self.music_is_looped:
+            channel_to_play.play(config.music_data[guild_id]['Mdata'][0],
+                                 after=lambda e: self.music_player(channel_to_play))
+        else:
+            try:
+                self.music_is_looped = False
+                print(config.music_data[guild_id]['Mdata'])
+                del config.music_data[guild_id]['Mdata'][0]
+                channel_to_play.play(config.music_data[guild_id]['Mdata'][0][0],
+                                     after=lambda e: self.music_player(channel_to_play, guild_id))
+                print('Playing...')
+            except BaseException:
+                return
+
 
 
     async def on_message(self, message):
@@ -130,6 +129,7 @@ class MainMessage(discord.Client):
                     message.channel.id in config.music_channels:
                 search_for = ' '.join(str(message.content).split())[len(command):]
                 url = AdditionThing.activate_url(search_for)
+                player = await YTDLSource.from_url(url, loop=self.loop, stream=False)
                 if message.guild.id not in config.music_data:
                     config.music_data[message.guild.id] = {}
                 if message.author.voice:
@@ -148,16 +148,16 @@ class MainMessage(discord.Client):
                 if not config.music_data[message.guild.id]['channel'].is_playing():
 
                     if 'Mdata' in config.music_data[message.guild.id]:
-                        config.music_data[message.guild.id]['Mdata'].append(url)
+                        config.music_data[message.guild.id]['Mdata'].append((player, url))
                     else:
-                        config.music_data[message.guild.id]['Mdata'] = [url]
-                    info = AdditionThing.url_info(config.music_data[message.guild.id]['Mdata'][0],
-                                                  message.author)
-                    player = await YTDLSource.from_url(config.music_data[message.guild.id]['Mdata'][0],
-                                                       loop=self.loop, stream=info[1])
+                        config.music_data[message.guild.id]['Mdata'] = [(player, url)]
+                    info = AdditionThing.url_info(url, message.author)
+
                     if config.music_data[message.author.guild.id]['channel']:
                         channel_with_bot = config.music_data[message.author.guild.id]['channel']
-                    channel_with_bot.play(player, after=lambda e: None)
+
+                    channel_with_bot.play(config.music_data[message.guild.id]['Mdata'][0][0],
+                                     after=lambda e: self.music_player(channel_with_bot, message.guild.id))
                     # self.next_song(message.channel, message.author))
 
                     music_message = await message.channel.send(embed=info[0])
@@ -165,7 +165,7 @@ class MainMessage(discord.Client):
                         await music_message.add_reaction(emoji)
                     config.music_payloads[message.guild.id] = {'mes_id': music_message.id, 'message': music_message}
                 else:
-                    config.music_data[message.guild.id]['Mdata'].append(url)
+                    config.music_data[message.guild.id]['Mdata'].append((player, url))
                     await message.channel.send(f'Добавлено в очередь, номер -'
                                          f' {len(config.music_data[message.guild.id]["Mdata"]) - 1}')
 
@@ -189,9 +189,6 @@ class MainMessage(discord.Client):
                         voice_channel.pause()
 
                     elif emoji == config.music_icons['play']:
-                        if not config.music_data[payload.guild_id]['channel']:
-                            config.music_data[payload.guild_id]['channel'] =\
-                                await payload.member.voice.channel.connect()
                         if config.music_data[payload.guild_id]['channel'].is_paused():
                             voice_channel = config.music_data[payload.guild_id]['channel']
                             voice_channel.resume()
@@ -211,11 +208,11 @@ class MainMessage(discord.Client):
                                 self.music_is_looped = True
 
                     elif emoji == config.music_icons['skip']:
+                        self.music_is_looped = False
                         if config.music_data[payload.guild_id]['channel'].is_playing():
-                            self.music_is_looped = False
-                            await self.next_song(self.get_channel(payload.channel_id), payload.member)
-                    elif emoji == config.music_icons['next']:
-                        await self.next_song(self.get_channel(payload.channel_id), payload.member)
+                            config.music_data[payload.guild_id]['channel'].pause()
+                            self.music_player(config.music_data[payload.guild_id]['channel'],
+                                              payload.guild_id)
 
 
 
@@ -242,5 +239,3 @@ def activate(token):
     print(bot)
 
 
-if __name__ == '__main__':
-    activate('Njk5Mzc0OTAzNzQ4NDYwNTY0.XpTdog.y-IIUJjYRQz93VlLuyKGxE5PZSI')
